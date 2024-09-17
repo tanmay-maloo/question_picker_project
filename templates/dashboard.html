@@ -1,0 +1,104 @@
+<!-- dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ user.username }}!</h2>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>Random Unsolved Question</h3>
+        {% if random_question %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ random_question.title }}</h5>
+                    <a href="{{ random_question.lc_link }}" target="_blank" class="btn btn-primary">Solve on LeetCode</a>
+                    <a href="{% url 'mark_done' random_question.id %}" class="btn btn-success">Mark as Done</a>
+                    <a href="{% url 'mark_favorite' random_question.id %}" class="btn btn-warning">Mark as Favorite</a>
+                </div>
+            </div>
+        {% else %}
+            <p>No unsolved questions available.</p>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-6">
+        <h3>Suggested Questions</h3>
+        <ul class="list-group">
+            {% for question in suggested_questions %}
+                <li class="list-group-item">
+                    <a href="{{ question.lc_link }}" target="_blank">{{ question.title }}</a>
+                    <a href="{% url 'mark_done' question.id %}" class="btn btn-sm btn-success float-end ms-2">Done</a>
+                    <a href="{% url 'mark_favorite' question.id %}" class="btn btn-sm btn-warning float-end">Favorite</a>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No suggested questions.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>Favorite Questions</h3>
+        {% for topic in favorite_questions %}
+            <h4>{{ topic.topic }}</h4>
+            <ul class="list-group">
+                {% for question in topic.questions %}
+                    <li class="list-group-item">{{ question.title }}</li>
+                {% endfor %}
+            </ul>
+        {% empty %}
+            <p>No favorite questions.</p>
+        {% endfor %}
+    </div>
+    
+    <div class="col-md-6">
+        <h3>Topic Progress</h3>
+        {% for topic in topic_progress %}
+            <h4>{{ topic.topic }}</h4>
+            <div class="progress mb-3">
+                <div class="progress-bar" role="progressbar" style="width: {{ topic.percentage }}%;" aria-valuenow="{{ topic.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ topic.percentage|floatformat:1 }}%</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3>Sheet Management</h3>
+        <a href="{% url 'reset_sheet' %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to reset your progress? This action cannot be undone.');">Reset Sheet Progress</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#restoreProgressModal">
+            Restore Progress
+        </button>
+    </div>
+</div>
+<!-- Restore Progress Modal -->
+<div class="modal fade" id="restoreProgressModal" tabindex="-1" aria-labelledby="restoreProgressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="restoreProgressModalLabel">Restore Progress</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'restore_progress' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="backupSelect" class="form-label">Select a backup to restore:</label>
+                        <select class="form-select" id="backupSelect" name="backup_file">
+                            {% for backup in backup_files %}
+                                <option value="{{ backup }}">{{ backup }}</option>
+                            {% empty %}
+                                <option value="" disabled>No backups available</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Restore</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
