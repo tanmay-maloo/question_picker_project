@@ -7,7 +7,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "testquestion_picker_project_project/wsgi.py"
+        "dest": "question_picker_project/wsgi.py"
       }
     ]
 }
