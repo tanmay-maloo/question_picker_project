@@ -18,7 +18,7 @@ import os
 from django.contrib import admin
 from django.urls import path, include
 
-admin_url = os.environ.get("ADMIN_URL")
+admin_url = os.environ.get("ADMIN_URL", "t_admin")
 urlpatterns = [
     path(f'{admin_url}/', admin.site.urls),
     path('', include('question_picker_app.urls')),

@@ -1,0 +1,13 @@
+{
+    "builds": [{
+      "src": "question_picker_project/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.11.3" }
+    }],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "testquestion_picker_project_project/wsgi.py"
+      }
+    ]
+}
